@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#e8f3ed;background:transparent}button{font:inherit;cursor:pointer}button:focus-visible,canvas:focus-visible{outline:2px solid #bbf678;outline-offset:4px}
+.hero{position:relative;height:1000px;overflow:hidden;border-radius:22px;background:radial-gradient(ellipse at 70% 52%,#294c40 0%,#112d25 42%,#091e19 85%)}
+.top{display:flex;justify-content:space-between;align-items:center;padding:25px 32px;border-bottom:1px solid #ffffff12;font-size:11px;letter-spacing:2px}.brand{font-weight:700}.status{color:#b7d1c0;letter-spacing:1px}.dot{display:inline-block;width:6px;height:6px;margin-right:8px;border-radius:50%;background:#b8ef78;box-shadow:0 0 14px #b8ef78}
+.copy{position:absolute;left:38px;top:109px;z-index:2;pointer-events:none;max-width:370px}.kicker{color:#b5ec7b;font-size:11px;letter-spacing:2.5px;font-weight:bold}.copy h1{font-size:clamp(34px,3.5vw,44px);line-height:1.04;letter-spacing:-3px;margin:20px 0}.copy h1 span{color:#b7ef7b}.copy p{font-size:14px;line-height:1.7;max-width:275px;color:#a9c1b4}.tag{display:inline-block;margin-top:16px;padding:9px 12px;border:1px solid #ffffff25;border-radius:30px;font-size:10px;letter-spacing:1.2px;color:#d0dfd4}
+#stage{position:absolute;inset:74px 0 100px 26%;touch-action:pan-y}canvas{display:block;width:100%;height:100%;touch-action:pan-y;cursor:grab}canvas:active{cursor:grabbing}.hint{position:absolute;bottom:157px;right:32px;font-size:10px;letter-spacing:1px;color:#a6bfb0;pointer-events:none}.controls{position:absolute;bottom:106px;right:28px;display:flex;gap:6px;z-index:3}.controls button{border:1px solid #ffffff25;background:#17392f;color:#c6d8cc;border-radius:7px;padding:11px 13px;font-size:11px}.controls button[aria-pressed=true]{background:#b8ef7b;color:#183025;border-color:#b8ef7b}.stats{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(3,1fr);background:#0a221dcc;border-top:1px solid #ffffff15;padding:22px 32px;gap:20px}.stat{border-right:1px solid #ffffff18}.stat:last-child{border:0}.stat small{display:block;font-size:9px;color:#9db6a7;letter-spacing:1.6px;margin-bottom:7px}.stat strong{font-size:24px;font-weight:500}.stat em{font-style:normal;font-size:12px;color:#9db6a7}.fallback{position:absolute;inset:35% 10% auto;padding:20px;background:#153a2e;border:1px solid #b7ef7b;border-radius:12px;line-height:1.6;font-size:14px}.model-label{position:absolute;top:100px;right:30px;text-align:right;color:#8fae9a;font-size:9px;letter-spacing:1.5px;line-height:1.8}
+@media(max-width:700px){.top{padding:22px 20px}.status{font-size:9px}.copy{left:24px;top:88px;max-width:320px}.copy h1{font-size:44px;margin:13px 0;letter-spacing:-2px}.copy p{font-size:12px;max-width:290px;margin:8px 0}.tag{margin-top:5px;padding:7px 10px}#stage{inset:280px -25px 125px -25px}.model-label{display:none}.controls{bottom:111px;right:0;left:0;justify-content:center}.controls button{padding:10px;font-size:10px}.hint{bottom:158px;right:20px;font-size:9px}.stats{padding:22px 20px;gap:12px}.stat strong{font-size:22px}.stat small{font-size:8px;letter-spacing:1px}}
+
+.tour-card{position:absolute;left:38px;top:440px;width:300px;padding:18px;background:#0b241e;border:1px solid #b8ef7838;border-radius:14px;z-index:3}.tour-card small{color:#b8ef7b;font-size:10px;letter-spacing:1.5px}.tour-card h2{font-size:20px;margin:10px 0}.tour-card p{color:#b4cbbd;font-size:12px;line-height:1.6;margin:0 0 12px;min-height:58px}.tour-card input{width:100%;accent-color:#b8ef7b}.tour-actions{display:flex;gap:7px;margin-top:10px}.tour-actions button{background:#224638;color:#e8f3ed;border:1px solid #ffffff25;padding:8px 10px;border-radius:6px;font-size:11px}.part-label{position:absolute;padding:5px 8px;background:#0b241eed;border:1px solid #b8ef7880;color:#def8c8;border-radius:5px;font-size:10px;pointer-events:none;white-space:nowrap;transform:translate(-50%,-100%)}.part-label.active{background:#b8ef7b;color:#163025}.model-label{top:87px}.hint{bottom:153px}
+@media(max-width:700px){.hero{height:1000px}.copy h1{font-size:38px}.copy p{max-width:310px}#stage{inset:270px 0 370px}.tour-card{top:auto;bottom:165px;left:20px;right:20px;width:auto;padding:14px}.tour-card p{min-height:38px}.tour-card h2{margin:6px 0}.hint{bottom:365px;font-size:8px}.controls{bottom:112px}.part-label{font-size:8px;padding:3px 5px}}
+.photo-view{position:absolute;inset:0;display:flex;align-items:center;perspective:1000px;z-index:1;overflow:hidden}.photo-view img{width:100%;height:auto;display:block;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .35s ease;mask-image:radial-gradient(ellipse at center,#000 52%,transparent 76%)}.photo-float{width:100%;animation:car-float 8s ease-in-out infinite}.photo-paused .photo-float{animation-play-state:paused}.photo-card{display:none}.photo-mode .photo-card{display:block}.photo-mode .tour-card:not(.photo-card),.photo-mode .model-control,.photo-mode #stage canvas,.photo-mode .part-label{display:none!important}.hero:not(.photo-mode) .photo-view,.hero:not(.photo-mode) #photo-motion{display:none}.photo-card p{min-height:0}.controls{flex-wrap:wrap}.photo-card h2{font-size:24px}
+@keyframes car-float{0%,100%{transform:translateY(3px) scale(.98)}50%{transform:translateY(-5px) scale(1.015)}}
+@media(prefers-reduced-motion:reduce){.photo-float{animation:none}.photo-view img{transition:none;transform:none}}
+@media(max-width:700px){.controls{gap:4px}.controls button{padding:9px 7px;font-size:9px}}
+.parts-tour .photo-float{position:relative;animation:none}.parts-tour .photo-view img{transform:none;transition:none}.parts-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.photo-card label{display:block;font-size:11px;color:#b4cbbd;margin:12px 0 6px}.image-part-label{pointer-events:none}.photo-card .tour-actions button{flex:1}
+@media(max-width:700px){.parts-tour .photo-card{bottom:165px}.parts-tour #stage{bottom:405px}.parts-tour .hint{bottom:405px}}
+</style></head><body>
+<main class="hero photo-mode">
+<div class="top"><span class="brand">CB / ELECTRIC LAB</span><span class="status"><span class="dot"></span>EXPLORE. EXPERIMENT. UNDERSTAND.</span></div>
+<div class="copy"><div class="kicker">THE SCIENCE BEHIND THE DRIVE</div><h1>Follow the energy.<br><span>Feel the motion.</span></h1><p>Explore an electric vehicle from the inside out. Bring the engineering to life, one experiment at a time.</p><span class="tag">8 MODULES &nbsp; / &nbsp; ENDLESS POSSIBILITIES</span></div>
+<div class="model-label" id="model-label">STUDIO VIEW / WIDEBODY COUPE</div>
+<div id="stage" aria-label="Car image"><div class="photo-view" id="photo-view"><div class="photo-float"><img src="__CAR_IMAGE__" alt="Graphite widebody sports coupe with polished mesh wheels, low front splitter and rear spoiler" width="1672" height="941" draggable="false"></div></div></div>
+<section class="tour-card photo-card" aria-label="Car image assembly"><small id="photo-phase">ASSEMBLED / 10 EXTERIOR PARTS</small><h2>Every part. Back in place.</h2><p>Separate the visible wheels, panels, cabin and spoiler, then watch them align again. Use 3D assembly to explore the illustrative internals.</p><label for="photo-progress">Part separation</label><input id="photo-progress" type="range" min="0" max="100" value="0" step="1"><div class="tour-actions"><button id="photo-explode">Disassemble</button><button id="photo-assemble">Reassemble</button></div></section>
+<div class="hint" id="hint">DRAG TO ROTATE &nbsp; · &nbsp; SCROLL TO ZOOM</div>
+<section class="tour-card" aria-label="EV assembly tour"><small id="tour-phase">ASSEMBLED / 8 ASSEMBLIES</small><h2 id="part-title">One EV. Every layer.</h2><p id="part-description">Watch the vehicle separate slowly, explore its main assemblies, then see everything fit back into place.</p><label for="assembly-progress" style="font-size:10px;color:#b4cbbd">Assembly tour progress</label><input id="assembly-progress" type="range" min="0" max="100" step="0.1" value="0"><div class="tour-actions"><button id="tour-toggle">Pause tour</button><button id="tour-explode">Disassemble</button><button id="tour-assemble">Reassemble</button></div></section>
+<div class="controls"><button id="view-mode" aria-pressed="false">3D assembly</button><button id="photo-motion" aria-pressed="true">Pause motion</button><button class="model-control" id="rotate" aria-pressed="true">Pause rotation</button><button class="model-control" id="drive" aria-pressed="false">Drive</button><button class="model-control" id="battery" aria-pressed="false">Battery view</button><button class="model-control" id="reset">Reset view</button></div>
+<div class="stats"><div class="stat"><small>YOUR BATTERY</small><strong>__CAPACITY__ <em>kWh</em></strong></div><div class="stat"><small>STATE OF CHARGE</small><strong>__SOC__<em> %</em></strong></div><div class="stat"><small>POWERTRAIN</small><strong>100<em> % electric</em></strong></div></div>
+</main>
+<script>/* THREE_ENGINE */</script>
+<script>
+(()=>{
+ const hero=document.querySelector('.hero'),view=document.getElementById('photo-view'),button=document.getElementById('view-mode'),motion=document.getElementById('photo-motion'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ let moving=!reduced.matches;
+ function syncMotion(){hero.classList.toggle('photo-paused',!moving);motion.textContent=moving?'Pause motion':'Play motion';motion.setAttribute('aria-pressed',String(moving));}
+ motion.onclick=()=>{moving=!moving;syncMotion();};
+ button.onclick=()=>{const model=hero.classList.toggle('photo-mode')===false;button.textContent=model?'Car image':'3D assembly';button.setAttribute('aria-pressed',String(model));document.getElementById('model-label').textContent=model?'3D ASSEMBLY / ILLUSTRATIVE ELECTRIC CONVERSION':'STUDIO VIEW / WIDEBODY COUPE';document.getElementById('hint').textContent=model?'DRAG TO ROTATE · SCROLL TO ZOOM':'MOVE YOUR POINTER TO EXPLORE';document.getElementById('stage').setAttribute('aria-label',model?'Interactive three-dimensional electric vehicle':'Car image');document.dispatchEvent(new CustomEvent('car-view-change',{detail:{model}}));};
+ view.onpointermove=e=>{if(reduced.matches||!moving)return;const r=view.getBoundingClientRect();view.style.setProperty('--ry',((e.clientX-r.left)/r.width-.5)*5+'deg');view.style.setProperty('--rx',-((e.clientY-r.top)/r.height-.5)*3+'deg');};
+ view.onpointerleave=()=>{view.style.setProperty('--rx','0deg');view.style.setProperty('--ry','0deg');};
+ reduced.addEventListener('change',()=>{if(reduced.matches){moving=false;view.onpointerleave();syncMotion();}});
+ document.getElementById('hint').textContent='MOVE YOUR POINTER TO EXPLORE';syncMotion();
+})();
+</script>
+<script>
+/* CAR_PARTS */
+(()=>{'use strict';
+const stage=document.getElementById('stage');
+try {
+const modelData=/* BLENDER_MODEL */;
+const T=THREE, scene=new T.Scene(),camera=new T.PerspectiveCamera(36,1,.1,100);
+const renderer=new T.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.5;stage.appendChild(renderer.domElement);
+renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','3D EV. Drag or use arrow keys to rotate. Plus and minus keys zoom.');
+scene.add(new T.HemisphereLight(0xdcefff,0x3e5140,3));
+function light(color,intensity,x,y,z){const l=new T.DirectionalLight(color,intensity);l.position.set(x,y,z);scene.add(l);return l;}
+const key=light(0xf1ffed,4,3,7,4);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-6;key.shadow.camera.right=6;key.shadow.camera.top=6;key.shadow.camera.bottom=-6;key.shadow.bias=-.001;light(0x80b9dd,3,-4,4,-4);light(0xc1f589,2,2,3,-5);
+const car=new T.Group();scene.add(car);
+// Evaluated Blender surfaces, embedded by Streamlit for offline loading.
+const groups={};
+for(const name of ['body','glazing','chassis','battery','motor','inverter','cooling']){groups[name]=new T.Group();groups[name].name=name;car.add(groups[name]);}
+const wheelAssembly=new T.Group();car.add(wheelAssembly);
+const wheels=Object.entries(modelData.wheels).map(([name,position])=>{const g=new T.Group();g.name=name;g.position.fromArray(position);groups[name]=g;wheelAssembly.add(g);return g;});
+const materials={},exteriorMaterials=[];
+for(const [name,m] of Object.entries(modelData.materials)){
+ const color=new T.Color().setRGB(...m.color);
+ materials[name]=new T.MeshPhysicalMaterial({color,metalness:m.metalness,roughness:m.roughness,clearcoat:m.exterior?1:.2,clearcoatRoughness:.15,envMapIntensity:name.includes('glass')?.3:.7,emissive:color,emissiveIntensity:m.emission,side:T.DoubleSide});
+}
+const outerMaterials={};
+function binaryArray(encoded,Type){const raw=atob(encoded),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return new Type(bytes.buffer);}
+for(const data of modelData.meshes){
+ const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.BufferAttribute(binaryArray(data.positions,Float32Array),3));geometry.setAttribute('normal',new T.BufferAttribute(binaryArray(data.normals,Int16Array),3,true));geometry.setIndex(new T.BufferAttribute(binaryArray(data.indices,Uint32Array),1));geometry.computeBoundingSphere();
+ let material=materials[data.material];
+ if(data.group==='body'||data.group==='glazing'){
+  if(!outerMaterials[data.material]){outerMaterials[data.material]=material.clone();exteriorMaterials.push(outerMaterials[data.material]);}
+  material=outerMaterials[data.material];
+ }
+ const object=new T.Mesh(geometry,material);object.castShadow=true;object.receiveShadow=true;groups[data.group].add(object);
+}
+const exterior=groups.body,glazing=groups.glazing,chassis=groups.chassis,pack=groups.battery,motor=groups.motor,inverter=groups.inverter,cooling=groups.cooling;
+const lime=new T.MeshStandardMaterial({color:0xb2ef6f,emissive:0x7bad3c,emissiveIntensity:.5});
+function mesh(geo,mat,x=0,y=0,z=0,parent=car){const m=new T.Mesh(geo,mat);m.position.set(x,y,z);m.receiveShadow=true;parent.add(m);return m;}
+function box(w,h,d,mat,x,y,z,parent=car){return mesh(new T.BoxGeometry(w,h,d),mat,x,y,z,parent);}
+// Broad studio reflections reveal the dark metallic bodywork without textures.
+const studio=new T.Scene();studio.background=new T.Color(0x263038);
+for(const [x,y,z,w,h] of [[0,5,0,8,4],[0,2,5,7,2],[-4,2,-3,4,3]]){
+ const panel=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:0xffffff,side:T.DoubleSide}));panel.position.set(x,y,z);panel.lookAt(0,.5,0);studio.add(panel);
+}
+const pmrem=new T.PMREMGenerator(renderer);const environment=pmrem.fromScene(studio,.04);scene.environment=environment.texture;pmrem.dispose();
+studio.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});
+const assemblies=[
+ {node:exterior,name:'Body & exterior',description:'The body panels form the aerodynamic outer shape. Bumpers, lights and mirrors support visibility and everyday protection.',offset:[0,1.65,0],anchor:[0,1.1,0]},
+ {node:glazing,name:'Cabin & glazing',description:'The glazed cabin encloses the passenger space. The roof and windows provide shelter and visibility.',offset:[0,2.5,0],anchor:[0,1.5,0]},
+ {node:wheelAssembly,name:'Wheels & tyres',description:'Tyres transfer motor torque to the road. Their grip lets the vehicle accelerate, steer and brake.',offset:[0,0,0],anchor:[-1.48,.7,-1.9]},
+ {node:chassis,name:'Chassis',description:'The structural platform supports the vehicle and locates the battery and drivetrain beneath the cabin.',offset:[0,.55,0],anchor:[0,.15,-.85]},
+ {node:pack,name:'Battery pack',description:'Underfloor battery modules store energy as direct current (DC). The low position helps keep the centre of gravity low.',offset:[-.55,.1,1.85],anchor:[0,.85,0]},
+ {node:motor,name:'Electric motor',description:'The traction motor converts electrical energy into rotation. During regenerative braking it acts as a generator.',offset:[1.5,.15,.8],anchor:[-1.5,.65,0]},
+ {node:inverter,name:'Inverter & HV connection',description:'The inverter converts battery DC into controlled AC for the motor. Orange connections represent high-voltage wiring.',offset:[1.2,1.45,-.95],anchor:[1.35,1.2,0]},
+ {node:cooling,name:'Cooling system',description:'A coolant circuit carries heat away from the battery and power electronics. The radiator releases that heat to the air.',offset:[2.1,.25,-.55],anchor:[1.98,1.15,0]}
+];
+assemblies.forEach(a=>{a.home=a.node.position.clone();a.label=document.createElement('span');a.label.className='part-label';a.label.textContent=a.name;a.label.hidden=true;stage.appendChild(a.label);});
+const wheelHomes=wheels.map(w=>w.position.clone());
+const ground=mesh(new T.CircleGeometry(5,96),new T.MeshStandardMaterial({color:0x07160f,roughness:1,envMapIntensity:.12}),0,.005,0,scene);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;
+for(const r of [3.05,3.12,4.05]){const ring=mesh(new T.RingGeometry(r,r+.009,128),new T.MeshBasicMaterial({color:0x73967e,transparent:true,opacity:.24,side:T.DoubleSide}),0,.017,0,scene);ring.rotation.x=-Math.PI/2;}
+const road=new T.Group();scene.add(road);for(let i=0;i<12;i++)box(.50,.006,.035,lime,-4+i*.72,.024,1.95,road);road.visible=false;
+let angle=-1.10,pitch=.14,distance=8.6,driving=false,xray=false;const media=matchMedia('(prefers-reduced-motion: reduce)');let rotating=false;
+const controls={rotate:document.getElementById('rotate'),drive:document.getElementById('drive'),battery:document.getElementById('battery')};
+let tourTime=0,tourPlaying=false,targetTime=null,explosion=0;
+const duration=80,progress=document.getElementById('assembly-progress'),tourToggle=document.getElementById('tour-toggle');
+const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
+function tourSync(){tourToggle.textContent=tourPlaying?'Pause tour':'Play tour';tourToggle.setAttribute('aria-pressed',String(tourPlaying));}
+tourToggle.onclick=()=>{tourPlaying=!tourPlaying;targetTime=null;tourSync();};
+function seekTour(t){targetTime=t;tourPlaying=true;rotating=false;driving=false;road.visible=false;if(media.matches){tourTime=t;targetTime=null;tourPlaying=false;}sync();tourSync();}
+document.getElementById('tour-explode').onclick=()=>seekTour(32);
+document.getElementById('tour-assemble').onclick=()=>{seekTour(tourTime<32?0:76);};
+progress.oninput=()=>{tourTime=Number(progress.value)/100*duration;tourPlaying=false;targetTime=null;tourSync();};
+let lastPart='';
+function updateTour(dt){
+ if(tourPlaying){if(targetTime!==null){const step=dt*Math.sign(targetTime-tourTime);if(Math.abs(targetTime-tourTime)<=dt){tourTime=targetTime;targetTime=null;tourPlaying=false;tourSync();}else tourTime+=step;}else tourTime=(tourTime+dt)%duration;}
+ explosion=tourTime<32?smooth((tourTime-4)/28):tourTime<44?1:1-smooth((tourTime-44)/28);
+ assemblies.forEach((a,i)=>{const amount=tourTime<32?smooth((tourTime-4-i*1.7)/16):tourTime<44?1:1-smooth((tourTime-44-(7-i)*1.7)/16);a.node.position.copy(a.home).addScaledVector(new T.Vector3(...a.offset),amount);if(i===2)wheels.forEach((w,j)=>{w.position.copy(wheelHomes[j]);w.position.z+=Math.sign(wheelHomes[j].z)*amount*.95;});});
+ const index=tourTime>=4&&tourTime<72?Math.min(7,Math.floor((tourTime<32?(tourTime-4)/28:tourTime<44?(tourTime-32)/12:(72-tourTime)/28)*8)):-1;
+ const part=assemblies[Math.max(0,index)],phase=tourTime<4||tourTime>=72?'ASSEMBLED':tourTime<32?'DISASSEMBLING':tourTime<44?'EXPLODED VIEW':'REASSEMBLING';
+ const partKey=phase+index;if(partKey!==lastPart){document.getElementById('tour-phase').textContent=phase+' / 8 ASSEMBLIES';document.getElementById('part-title').textContent=index<0?'One EV. Every layer.':part.name;document.getElementById('part-description').textContent=index<0?'Watch the vehicle separate slowly, explore its main assemblies, then see everything fit back into place.':part.description;lastPart=partKey;}
+ progress.value=tourTime/duration*100;
+ assemblies.forEach((a,i)=>{a.label.hidden=explosion<.15;a.label.classList.toggle('active',i===index);});
+}
+function sync(){controls.rotate.setAttribute('aria-pressed',String(rotating));controls.rotate.textContent=rotating?'Pause rotation':'Rotate model';controls.drive.setAttribute('aria-pressed',String(driving));controls.drive.textContent=driving?'Stop driving':'Drive';controls.battery.setAttribute('aria-pressed',String(xray));}
+controls.rotate.onclick=()=>{rotating=!rotating;sync();};controls.drive.onclick=()=>{driving=!driving;if(driving){tourTime=0;tourPlaying=false;targetTime=null;tourSync();}road.visible=driving;sync();};controls.battery.onclick=()=>{xray=!xray;exteriorMaterials.forEach(m=>{m.transparent=xray;m.opacity=xray?.10:1;m.depthWrite=!xray;m.needsUpdate=true;});document.getElementById('hint').textContent=xray?'ILLUSTRATIVE EV BATTERY / UNDERFLOOR STORAGE':'DRAG TO ROTATE · SCROLL TO ZOOM';sync();};
+document.getElementById('reset').onclick=()=>{angle=-1.10;pitch=.14;distance=8.6;rotating=false;tourTime=0;tourPlaying=!media.matches;targetTime=null;tourSync();driving=false;road.visible=false;if(xray)controls.battery.click();sync();};
+media.addEventListener('change',()=>{if(media.matches){tourPlaying=false;targetTime=null;tourSync();rotating=false;driving=false;road.visible=false;sync();}});
+let pointer=null;
+renderer.domElement.addEventListener('pointerdown',e=>{pointer={id:e.pointerId,x:e.clientX,y:e.clientY};renderer.domElement.setPointerCapture(e.pointerId);rotating=false;sync();});
+renderer.domElement.addEventListener('pointermove',e=>{if(!pointer)return;angle-=(e.clientX-pointer.x)*.008;pitch=Math.max(.08,Math.min(.8,pitch+(e.clientY-pointer.y)*.004));pointer.x=e.clientX;pointer.y=e.clientY;});
+for(const event of ['pointerup','pointercancel','lostpointercapture'])renderer.domElement.addEventListener(event,()=>pointer=null);
+renderer.domElement.addEventListener('wheel',e=>{if(!e.ctrlKey&&document.activeElement!==renderer.domElement)return;e.preventDefault();distance=Math.max(6.4,Math.min(12,distance+e.deltaY*.006));},{passive:false});
+renderer.domElement.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-'].includes(e.key))return;e.preventDefault();rotating=false;if(e.key==='ArrowLeft')angle-=.1;if(e.key==='ArrowRight')angle+=.1;if(e.key==='ArrowUp')pitch=Math.min(.8,pitch+.05);if(e.key==='ArrowDown')pitch=Math.max(.08,pitch-.05);if(e.key==='+'||e.key==='=')distance=Math.max(6.4,distance-.3);if(e.key==='-')distance=Math.min(12,distance+.3);sync();});
+new ResizeObserver(()=>{const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();needsRender=true;}).observe(stage);
+let previous=0,visible=true,needsRender=true;new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;needsRender=true;}).observe(stage);
+document.addEventListener('car-view-change',()=>{needsRender=true;});
+function frame(time){requestAnimationFrame(frame);const dt=Math.min((time-previous)/1000,.05);previous=time;if(document.querySelector('.hero').classList.contains('photo-mode')||(!visible&&!needsRender)||document.hidden)return;needsRender=false;updateTour(visible?dt:0);if(rotating&&visible)angle+=dt*.10;if(driving&&visible){wheels.forEach(w=>w.rotation.z-=dt*2.5/modelData.wheelRadius);road.children.forEach(m=>{m.position.x-=dt*2.5;if(m.position.x<-4.2)m.position.x+=8.64;});}car.updateMatrixWorld(true);
+const bounds=new T.Box3().setFromObject(car),sphere=bounds.getBoundingSphere(new T.Sphere());
+const vertical=T.MathUtils.degToRad(camera.fov)/2,horizontal=Math.atan(Math.tan(vertical)*camera.aspect);
+const fit=sphere.radius/Math.sin(Math.min(vertical,horizontal)) * 1.12;
+const viewDistance=fit*(distance/8.6),target=sphere.center;
+camera.position.set(target.x+Math.cos(angle)*viewDistance,target.y+viewDistance*pitch,target.z+Math.sin(angle)*viewDistance);camera.lookAt(target);camera.updateMatrixWorld();
+
+assemblies.forEach(a=>{const point=a.node.localToWorld(new T.Vector3(...a.anchor)).project(camera);a.label.style.left=Math.max(a.label.offsetWidth/2,Math.min(stage.clientWidth-a.label.offsetWidth/2,(point.x+1)*stage.clientWidth/2))+'px';a.label.style.top=((-point.y+1)*stage.clientHeight/2)+'px';if(point.z>1)a.label.hidden=true;});
+const placed=[];assemblies.forEach(a=>{if(a.label.hidden)return;const x=parseFloat(a.label.style.left),w=a.label.offsetWidth;let y=parseFloat(a.label.style.top);for(let n=0;n<8;n++){if(!placed.some(b=>Math.abs(x-b.x)<(w+b.w)/2+5&&Math.abs(y-b.y)<23))break;y-=24;}a.label.style.top=y+'px';placed.push({x,y,w});});renderer.render(scene,camera);}
+sync();tourSync();requestAnimationFrame(frame);window.__evReady=true;stage.dataset.modelInfo=JSON.stringify({source:'Blender',meshBatches:modelData.meshes.length,wheels:wheels.length,assemblies:assemblies.length});
+renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();document.getElementById('hint').textContent='3D view interrupted. Reload to restore.';});
+}catch(error){stage.querySelector('canvas')?.remove();document.getElementById('view-mode').disabled=true;document.getElementById('view-mode').textContent='3D unavailable';document.getElementById('hint').textContent='STUDIO VIEW';console.error(error);}
+})();
+</script></body></html>
